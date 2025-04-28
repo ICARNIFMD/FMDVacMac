@@ -1,11 +1,17 @@
-Package: FmdVacMac
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Package: FMDVacMac
+Title: R Package for Prediction of Foot-and-Mouth Disease Virus Vaccine Matching Score (r1-value)
+Version: 0.1
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person ("Samarendra", "Das", email = "Samarendra.das@icar.org.in", role = c("aut", "cre"))
+Description: Foot-and-mouth disease (FMD) is a highly contagious viral disease that affects cloven-hoofed animals, causing substantial economic losses worldwide, particularly in endemic regions such as Asia, Africa, and parts of South America. Vaccine matching, measured by the vaccine matching score (r1-value), is critical for evaluating the expected level of protection offered by FMD vaccines against circulating field strains. Traditionally, r1-values are determined through labor-intensive and high-risk serological tests, such as the Virus Neutralization Test (VNT). The FMDVacMac package provides a sequence-based, machine-learning-powered approach to predict the vaccine matching score (r1-value) directly from VP1 nucleotide sequences of FMD virus isolates. This Package offers a safer, faster, and more scalable alternative for researchers and veterinarians, facilitating effective vaccine selection and improved FMD control strategies.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports: 
+    Biostrings,
+    e1071,
+    openxlsx,
+    randomForest,
+    stringr,
+    xgboost
