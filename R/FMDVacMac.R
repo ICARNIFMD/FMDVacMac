@@ -47,7 +47,7 @@
 #'ACCACCTCCCCGGGTGAGTCAGCTGACCCCGTGACCGCCACTGTTGAAAACTACGGCGGTGAGACACAGG...
 #' model_choice : Options are "xgboost", "rf", or "svm"
 #' FMDVacMac (field_Isolate, vaccine_Strain, "rf")
-Fmdvacmac <- function(field_Isolate, vaccine_Strain, model_choice) {
+FMDVacMac <- function(field_Isolate, vaccine_Strain, model_choice) {
   
   ############## Feature Engineering Function ##############
   generate_vaccine_matching_features <- function(field_isolate, vaccine_Strain, k = 3) {
