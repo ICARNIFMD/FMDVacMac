@@ -46,6 +46,13 @@
 #'>VP1_R2/1975
 #'ACCACCTCCCCGGGTGAGTCAGCTGACCCCGTGACCGCCACTGTTGAAAACTACGGCGGTGAGACACAGG...
 #' model_choice : Options are "xgboost", "rf", or "svm"
+# Loading required libraries
+library(Biostrings)
+library(e1071)
+library(openxlsx)
+library(randomForest)
+library(stringr)
+library(xgboost)
 FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
   
   ############## Feature Engineering Function ##############
