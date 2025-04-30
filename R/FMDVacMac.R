@@ -146,20 +146,38 @@ FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
   
   ############## Prediction based on Model Choice ##############
  if (model_choice == "xgboost") {
-    model_path <- system.file("extdata", "O_VP1_R21975_xgboost.RDS", package = "FMDVacMac")
-    model <- readRDS(model_path)
-    predictions <- predict(model, result_matrix)
-  } else if (model_choice == "rf") {
-    model_path <- system.file("extdata", "O_VP1_R21975_RF.RDS", package = "FMDVacMac")
-    model <- readRDS(model_path)
-    predictions <- predict(model, result_matrix, type = "response")
-  } else if (model_choice == "svm") {
-    model_path <- system.file("extdata", "O_VP1_R21975_svm.RDS", package = "FMDVacMac")
-    model <- readRDS(model_path)
-    predictions <- predict(model, result_matrix, type = "pred")
+  model_path <- system.file("extdata", "O_VP1_R21975_xgboost.RDS", package = "FMDVacMac")
+  model <- readRDS(model_path)
+  
+  # Check if model is xgboost model
+  if (inherits(model, "xgb.Booster")) {
+    predictions <- xgboost::predict(model, result_matrix)
   } else {
-    stop("Invalid model_choice. Choose from 'xgboost', 'rf', or 'svm'.")
+    stop("Loaded model is not an xgboost model.")
   }
+} else if (model_choice == "rf") {
+  model_path <- system.file("extdata", "O_VP1_R21975_RF.RDS", package = "FMDVacMac")
+  model <- readRDS(model_path)
+  
+  # Check if model is a randomForest model
+  if (inherits(model, "randomForest")) {
+    predictions <- predict(model, result_matrix, type = "response")
+  } else {
+    stop("Loaded model is not a randomForest model.")
+  }
+} else if (model_choice == "svm") {
+  model_path <- system.file("extdata", "O_VP1_R21975_svm.RDS", package = "FMDVacMac")
+  model <- readRDS(model_path)
+  
+  # Check if model is an SVM model (caret or e1071)
+  if (inherits(model, c("svm", "train"))) {
+    predictions <- predict(model, result_matrix)
+  } else {
+    stop("Loaded model is not an svm model.")
+  }
+} else {
+  stop("Invalid model_choice. Choose from 'xgboost', 'rf', or 'svm'.")
+}
   
   ############## Final Output ##############
   output <- data.frame(
