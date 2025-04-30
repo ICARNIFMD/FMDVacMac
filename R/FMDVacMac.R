@@ -52,6 +52,7 @@
 #' @import randomForest
 #' @import stringr
 #' @import xgboost
+#' @import caret
 
 FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
   
