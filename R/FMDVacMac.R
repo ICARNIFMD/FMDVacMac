@@ -138,14 +138,17 @@ FMDVacMac <- function(field_Isolate, vaccine_Strain, model_choice) {
   rownames(result_matrix) <- names(field_isolate)
   
   ############## Prediction based on Model Choice ##############
-  if (model_choice == "xgboost") {
-    model <- readRDS("O_VP1_R21975_xgboost.RDS")
+ if (model_choice == "xgboost") {
+    model_path <- system.file("extdata", "O_VP1_R21975_xgboost.RDS", package = "FMDVacMac")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
   } else if (model_choice == "rf") {
-    model <- readRDS("O_VP1_R21975_RF.RDS")
+    model_path <- system.file("extdata", "O_VP1_R21975_RF.RDS", package = "FMDVacMac")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "response")
   } else if (model_choice == "svm") {
-    model <- readRDS("O_VP1_R21975_svm.RDS")
+    model_path <- system.file("extdata", "O_VP1_R21975_svm.RDS", package = "FMDVacMac")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "pred")
   } else {
     stop("Invalid model_choice. Choose from 'xgboost', 'rf', or 'svm'.")
