@@ -46,6 +46,12 @@
 #'>VP1_R2/1975
 #'ACCACCTCCCCGGGTGAGTCAGCTGACCCCGTGACCGCCACTGTTGAAAACTACGGCGGTGAGACACAGG...
 #' model_choice : Options are "xgboost", "rf", or "svm"
+#' @import Biostrings
+#' @import e1071
+#' @import openxlsx
+#' @import randomForest
+#' @import stringr
+#' @import xgboost
 
 FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
   
