@@ -36,7 +36,7 @@
 #'"Non-Protected": if the r̂_1-value < 0.3, indicating lack of cross-protection.
 #' @export
 #'
-#' @examples FMDVacMac (field_Isolate, vaccine_Strain, "rf")
+#' @examples FMDVacMac (field_isolate, vaccine_Strain, "rf")
 #'field_isolate: 
 #'>ICFMD182/2022
 #'ACAACCTCCACAGGTGAGTCGGCTAATCCCGTGACTGCCACCGTTGAAAACTACGGAGGCGAGACA....
@@ -46,7 +46,7 @@
 #'>VP1_R2/1975
 #'ACCACCTCCCCGGGTGAGTCAGCTGACCCCGTGACCGCCACTGTTGAAAACTACGGCGGTGAGACACAGG...
 #' model_choice : Options are "xgboost", "rf", or "svm"
-FMDVacMac <- function(field_Isolate, vaccine_Strain, model_choice) {
+FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
   
   ############## Feature Engineering Function ##############
   generate_vaccine_matching_features <- function(field_isolate, vaccine_Strain, k = 3) {
