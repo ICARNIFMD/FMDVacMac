@@ -54,22 +54,37 @@
 #' @import xgboost
 #' @import caret
 
-FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
+FMDVacMac <- function(field_isolate, serotype, vaccine_Strain, model_choice) {
+  if (tolower(serotype) != "o") {
+    stop("Invalid serotype. This function only supports serotype 'O'. Please input the correct serotype.")
+  }
   
-  ############## Feature Engineering Function ##############
+  # Read vaccine sequence
+  if (vaccine_Strain == "R21975") {
+    VP1_R21975_1.txt<- system.file("extdata", "VP1_R21975_1.txt", package = "FMDVacMac")
+    vaccine_Strain_seq <- readDNAStringSet("VP1_R21975_1.txt", format = "fasta")
+  } else if (vaccine_Strain == "Manisha") {
+    O1_Manisa_Turkey69.txt<- system.file("extdata", "O1_Manisa_Turkey69.txt", package = "FMDVacMac")
+    vaccine_Strain_seq <- readDNAStringSet("O1_Manisa_Turkey69.txt", format = "fasta")
+  } else if (vaccine_Strain == "Ethopia") {
+    ETH382005_VP1.txt<- system.file("extdata", "ETH382005_VP1.txt", package = "FMDVacMac")
+    vaccine_Strain_seq <- readDNAStringSet("ETH382005_VP1.txt", format = "fasta")
+  } else {
+    stop("Invalid vaccine_Strain. Choose from: 'R21975', 'Manisha', 'Ethopia'.")
+  }
+  
   generate_vaccine_matching_features <- function(field_isolate, vaccine_Strain, k = 3) {
     field_features <- oligonucleotideFrequency(field_isolate, width = k)
     vaccine_features <- oligonucleotideFrequency(vaccine_Strain, width = k)
     
     calculate_distances <- function(field, vaccine) {
-      apply(field, 1, function(row) sqrt(sum((vaccine - row) ^ 2)))
+      apply(field, 1, function(row) sqrt(sum((vaccine - row)^2)))
     }
     distance_vector <- calculate_distances(field_features, vaccine_features[1, ])
     
     field_AA_seq <- translate(field_isolate, if.fuzzy.codon = "X")
     vaccine_AA_seq <- translate(vaccine_Strain, if.fuzzy.codon = "X")
     
-    # Polymorphic Distance
     combined_sequences <- c(as.character(field_AA_seq), as.character(vaccine_AA_seq))
     seq_matrix <- do.call(rbind, strsplit(combined_sequences, ""))
     polymorphic_sites <- which(apply(seq_matrix, 2, function(col) length(unique(col)) > 1))
@@ -77,15 +92,14 @@ FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
     polymorphic_matrix <- seq_matrix[, polymorphic_sites, drop = FALSE]
     coded_differences <- t(apply(polymorphic_matrix, 2, function(col) ifelse(col == col[1], 0, 1)))
     coded_differences_df <- as.data.frame(t(coded_differences))
-    
     last_sequence <- coded_differences_df[nrow(coded_differences_df), ]
+    
     poly_dist <- apply(coded_differences_df[-nrow(coded_differences_df), ], 1, function(sequence) {
       combined <- rbind(sequence, last_sequence)
       distance_matrix <- dist(combined, method = "binary")
       as.numeric(distance_matrix[1])
     })
     
-    # Amino Acid Distance
     sequences <- as.character(c(field_AA_seq, vaccine_AA_seq))
     poisson_corrected_distance_variable_length <- function(seq1, seq2) {
       max_length <- max(nchar(seq1), nchar(seq2))
@@ -95,19 +109,18 @@ FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
       p_hat <- num_diff / max_length
       if (p_hat <= 1) -log(1 - p_hat) else NA
     }
+    
     vaccine_idx <- length(sequences)
-    field_indices <- 1:(vaccine_idx - 1)
+    field_sequences <- sequences[1:(vaccine_idx - 1)]
     vaccine_sequence <- sequences[vaccine_idx]
-    field_sequences <- sequences[field_indices]
     
     AA_Distance <- sapply(field_sequences, function(field_seq) {
       poisson_corrected_distance_variable_length(field_seq, vaccine_sequence)
     })
     
-    # N-glycosylation Sites
     find_nglycosylation_sites <- function(sequence) {
       pattern <- "N[^P][ST]"
-      matches <- gregexpr(pattern, toupper(as.character(sequence)), perl = TRUE)
+      matches <- gregexpr(pattern, toupper(sequence), perl = TRUE)
       if (length(matches[[1]]) > 0 && matches[[1]][1] != -1) {
         substring(sequence, matches[[1]], matches[[1]] + 2)
       } else {
@@ -115,9 +128,7 @@ FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
       }
     }
     
-    nucl_to_amino_acid_seq_final <- c(as.character(field_AA_seq), as.character(vaccine_AA_seq))
-    ngly_sites <- lapply(nucl_to_amino_acid_seq_final, find_nglycosylation_sites)
-    
+    ngly_sites <- lapply(sequences, find_nglycosylation_sites)
     field_isolates <- ngly_sites[1:(length(ngly_sites) - 1)]
     vaccine_sites <- ngly_sites[[length(ngly_sites)]]
     
@@ -126,6 +137,7 @@ FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
       union <- length(union(A, B))
       if (union == 0) 0 else intersection / union
     }
+    
     vaccine_field_distances <- sapply(field_isolates, function(field_sites) {
       jaccard_index(field_sites, vaccine_sites)
     })
@@ -136,39 +148,60 @@ FMDVacMac <- function(field_isolate, vaccine_Strain, model_choice) {
       "AMINO ACID POLYM DIST" = poly_dist,
       "Kmer dist" = distance_vector
     )
-    
     return(combined_df)
   }
   
-  ############## Feature Extraction ##############
-  features_df <- generate_vaccine_matching_features(field_isolate, vaccine_Strain)
+  features_df <- generate_vaccine_matching_features(field_isolate, vaccine_Strain_seq)
   result_matrix <- as.matrix(features_df)
   rownames(result_matrix) <- names(field_isolate)
   
-  ############## Prediction based on Model Choice ##############
- if (model_choice == "xgboost") {
-  model_path <- system.file("extdata", "O_VP1_R21975_xgboost.RDS", package = "FMDVacMac")
-  model <- readRDS(model_path)
-  predictions <- predict(model, result_matrix)
-} else if (model_choice == "rf") {
-  model_path <- system.file("extdata", "O_VP1_R21975_RF.RDS", package = "FMDVacMac")
-  model <- readRDS(model_path)
-  predictions <- predict(model, result_matrix, type = "response")
-} else if (model_choice == "svm") {
-  model_path <- system.file("extdata", "O_VP1_R21975_svm.RDS", package = "FMDVacMac")
-  model <- readRDS(model_path)
-  predictions <- predict(model, result_matrix, type = "pred")
-} else {
-  stop("Invalid model_choice. Choose from 'xgboost', 'rf', or 'svm'.")
-}
+  vaccine_strain <- vaccine_Strain  # fix the case mismatch
   
-  ############## Final Output ##############
+  if (vaccine_strain == "R21975" && model_choice == "rf") {
+    model_path <- system.file("extdata", "O_VP1_R21975_RF.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix, type = "response")
+  } else if (vaccine_strain == "R21975" && model_choice == "svm") {
+    model_path <- system.file("extdata", "O_VP1_R21975_svm.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix, type = "pred")
+  } else if (vaccine_strain == "R21975" && model_choice == "xgboost") {
+    model_path <- system.file("extdata", "O_VP1_R21975_xgboost.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix)
+  } else if (vaccine_strain == "Manisha" && model_choice == "rf") {
+    model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_RF.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix, type = "response")
+  } else if (vaccine_strain == "Manisha" && model_choice == "svm") {
+    model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_svm.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix, type = "pred")
+  } else if (vaccine_strain == "Manisha" && model_choice == "xgboost") {
+    model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_xgboost.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix)
+  } else if (vaccine_strain == "Ethopia" && model_choice == "rf") {
+    model_path <- system.file("extdata", "O_ETH382005_VP1_RF.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix, type = "response")
+  } else if (vaccine_strain == "Ethopia" && model_choice == "svm") {
+    model_path <- system.file("extdata", "O_ETH382005_VP1_svm.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix, type = "pred")
+  } else if (vaccine_strain == "Ethopia" && model_choice == "xgboost") {
+    model_path <- system.file("extdata", "O_ETH382005_VP1_xgboost.RDS", package = "FMDVacMac")
+    model <- readRDS("model_path")
+    predictions <- predict(model, result_matrix)
+  } else {
+    stop("Invalid vaccine_Strain or model_choice. Choose vaccine_Strain from: 'R21975', 'Manisha', 'Ethopia'.")
+  }
+  
   output <- data.frame(
     Accession = rownames(result_matrix),
     Prediction_Score = predictions,
     Remarks = ifelse(predictions > 0.3, "Protected", "Non-Protected")
   )
-  
   print(output)
   return(output)
 }
