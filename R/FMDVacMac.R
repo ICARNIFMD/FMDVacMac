@@ -61,14 +61,14 @@ FMDVacMac <- function(field_isolate, serotype, vaccine_Strain, model_choice) {
   
   # Read vaccine sequence
   if (vaccine_Strain == "R21975") {
-    VP1_R21975_1.txt<- system.file("extdata", "VP1_R21975_1.txt", package = "FMDVacMac")
-    vaccine_Strain_seq <- readDNAStringSet("VP1_R21975_1.txt", format = "fasta")
+    VPR<- system.file("extdata", "VP1_R21975_1.txt", package = "FMDVacMac")
+    vaccine_Strain_seq <- readDNAStringSet(VPR, format = "fasta")
   } else if (vaccine_Strain == "Manisha") {
-    O1_Manisa_Turkey69.txt<- system.file("extdata", "O1_Manisa_Turkey69.txt", package = "FMDVacMac")
-    vaccine_Strain_seq <- readDNAStringSet("O1_Manisa_Turkey69.txt", format = "fasta")
+    Manisa<- system.file("extdata", "O1_Manisa_Turkey69.txt", package = "FMDVacMac")
+    vaccine_Strain_seq <- readDNAStringSet(Manisa, format = "fasta")
   } else if (vaccine_Strain == "Ethopia") {
-    ETH382005_VP1.txt<- system.file("extdata", "ETH382005_VP1.txt", package = "FMDVacMac")
-    vaccine_Strain_seq <- readDNAStringSet("ETH382005_VP1.txt", format = "fasta")
+    ETH<- system.file("extdata", "ETH382005_VP1.txt", package = "FMDVacMac")
+    vaccine_Strain_seq <- readDNAStringSet(ETH, format = "fasta")
   } else {
     stop("Invalid vaccine_Strain. Choose from: 'R21975', 'Manisha', 'Ethopia'.")
   }
