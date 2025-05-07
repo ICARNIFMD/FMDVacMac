@@ -159,39 +159,39 @@ FMDVacMac <- function(field_isolate, serotype, vaccine_Strain, model_choice) {
   
   if (vaccine_strain == "R21975" && model_choice == "rf") {
     model_path <- system.file("extdata", "O_VP1_R21975_RF.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "response")
   } else if (vaccine_strain == "R21975" && model_choice == "svm") {
     model_path <- system.file("extdata", "O_VP1_R21975_svm.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "pred")
   } else if (vaccine_strain == "R21975" && model_choice == "xgboost") {
     model_path <- system.file("extdata", "O_VP1_R21975_xgboost.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
   } else if (vaccine_strain == "Manisha" && model_choice == "rf") {
     model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_RF.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "response")
   } else if (vaccine_strain == "Manisha" && model_choice == "svm") {
     model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_svm.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "pred")
   } else if (vaccine_strain == "Manisha" && model_choice == "xgboost") {
     model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_xgboost.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
   } else if (vaccine_strain == "Ethopia" && model_choice == "rf") {
     model_path <- system.file("extdata", "O_ETH382005_VP1_RF.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "response")
   } else if (vaccine_strain == "Ethopia" && model_choice == "svm") {
     model_path <- system.file("extdata", "O_ETH382005_VP1_svm.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix, type = "pred")
   } else if (vaccine_strain == "Ethopia" && model_choice == "xgboost") {
     model_path <- system.file("extdata", "O_ETH382005_VP1_xgboost.RDS", package = "FMDVacMac")
-    model <- readRDS("model_path")
+    model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
   } else {
     stop("Invalid vaccine_Strain or model_choice. Choose vaccine_Strain from: 'R21975', 'Manisha', 'Ethopia'.")
