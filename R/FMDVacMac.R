@@ -10,6 +10,7 @@
 #'ACCACTGCGACGGGAGAGTCAGCAGACCCTGTTACCACCACCGTTGAGAACTACGGCGGTGAAACA.....
 #'>IND 168/2004
 #'ACCACCACAACCGGTGAGTCGGCGGACCCGGTGACAACCACGGTTGAGAACTACGGAGGAACTACG.....
+#' @param serotype the package trained for serotype "o".
 #' @param vaccine_strain A `DNAStringSet` object containing the nucleotide sequence of the vaccine strain. 
 #' The vaccine strain represents the reference strain used in the vaccine, and its sequence will be compared to the field strains
 #' to predict the matching score. The input sequence should be in standard FASTA format, containing only nucleotide bases: A, T, G, and C.
