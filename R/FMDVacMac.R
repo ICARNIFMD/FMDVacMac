@@ -21,6 +21,7 @@
 #'"xgboost"`: Uses the XGBoost model, a gradient boosting method known for its high performance in structured/tabular data.
 #'"rf"`: Uses the Random Forest model, an ensemble method based on decision trees, often effective in handling complex datasets with multiple features.
 #'"svm"`: Uses the Support Vector Machine (SVM) model, which is commonly applied for classification tasks and works well in high-dimensional spaces. 
+#' "GBM" :ses Gradient Boosting Machine, an ensemble method that builds decision trees sequentially to improve predictive accuracy.
 #'The choice of model will affect the prediction of the vaccine matching score based on the field and vaccine strain sequences.
 #'
 #' @return A `data.frame` with the following columns:
@@ -207,7 +208,7 @@ FMDVacMac <- function(field_isolate, serotype, vaccine_Strain, model_choice) {
     model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
   } else {
-    stop("Invalid vaccine_Strain or model_choice. Choose vaccine_Strain from: 'R21975', 'Manisha', 'Ethopia'.")
+    stop("Invalid vaccine_Strain or model_choice. Choose vaccine_Strain from: 'R21975', 'Manisha', 'Ethopia' AND model_choice from:'rf', 'svm', 'xgboost', 'GBM'.")
   }
   
   output <- data.frame(
