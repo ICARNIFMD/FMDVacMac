@@ -170,6 +170,10 @@ FMDVacMac <- function(field_isolate, serotype, vaccine_Strain, model_choice) {
     model_path <- system.file("extdata", "O_VP1_R21975_xgboost.RDS", package = "FMDVacMac")
     model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
+  } else if (vaccine_strain == "R21975" && model_choice == "GBM") {
+    model_path <- system.file("extdata", "O_VP1_R21975_gbm.RDS", package = "FMDVacMac")
+    model <- readRDS(model_path)
+    predictions <- predict(model, result_matrix)
   } else if (vaccine_strain == "Manisha" && model_choice == "rf") {
     model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_RF.RDS", package = "FMDVacMac")
     model <- readRDS(model_path)
@@ -182,6 +186,10 @@ FMDVacMac <- function(field_isolate, serotype, vaccine_Strain, model_choice) {
     model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_xgboost.RDS", package = "FMDVacMac")
     model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
+  } else if (vaccine_strain == "Manisha" && model_choice == "GBM") {
+    model_path <- system.file("extdata", "O_O1_Manisa_Turkey69_gbm.RDS", package = "FMDVacMac")
+    model <- readRDS(model_path)
+    predictions <- predict(model, result_matrix)
   } else if (vaccine_strain == "Ethopia" && model_choice == "rf") {
     model_path <- system.file("extdata", "O_ETH382005_VP1_RF.RDS", package = "FMDVacMac")
     model <- readRDS(model_path)
@@ -192,6 +200,10 @@ FMDVacMac <- function(field_isolate, serotype, vaccine_Strain, model_choice) {
     predictions <- predict(model, result_matrix, type = "pred")
   } else if (vaccine_strain == "Ethopia" && model_choice == "xgboost") {
     model_path <- system.file("extdata", "O_ETH382005_VP1_xgboost.RDS", package = "FMDVacMac")
+    model <- readRDS(model_path)
+    predictions <- predict(model, result_matrix)
+  } else if (vaccine_strain == "Ethopia" && model_choice == "GBM") {
+    model_path <- system.file("extdata", "O_ETH382005_VP1_gbm.RDS", package = "FMDVacMac")
     model <- readRDS(model_path)
     predictions <- predict(model, result_matrix)
   } else {
